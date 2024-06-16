@@ -28,6 +28,15 @@
         .center-text {
             text-align: center;
         }
+        .btn-primary {
+           background-color: #007bff;
+           border-color: #007bff;
+           color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +54,7 @@
     <script>
         $(document).ready(function() {
             // Inicializar el formulario DevExtreme
-            $("#formContainer").dxForm({
+            var formInstance = $("#formContainer").dxForm({
                 formData: {},
                 items: [
                     {
@@ -77,26 +86,31 @@
                         itemType: "button",
                         buttonOptions: {
                             text: "Registrar Contacto",
-                            elementAttr: { class: "btn btn-primary" },
+                            elementAttr: { class: "btn-primary" },
                             onClick: function(e) {
-                                var formData = $("#formContainer").dxForm("instance").option("formData");
-                                $.ajax({
-                                    url: '<?php echo base_url('index.php/welcome/saveData'); ?>',
-                                    type: 'POST',
-                                    data: formData,
-                                    success: function(response) {
-                                        alert('Datos guardados correctamente');
-                                        $("#dataGridContainer").dxDataGrid("instance").refresh();
-                                    },
-                                    error: function(jqXHR, textStatus, errorThrown) {
-                                        console.log(textStatus, errorThrown);
-                                    }
-                                });
+                                var formData = formInstance.option("formData");
+                                if (formData.tipo_documento && formData.numero_documento && formData.nombre && formData.correo && formData.direccion) {
+                                    $.ajax({
+                                        url: '<?php echo base_url('index.php/welcome/saveData'); ?>',
+                                        type: 'POST',
+                                        data: formData,
+                                        success: function(response) {
+                                            alert('Datos guardados correctamente');
+                                            $("#dataGridContainer").dxDataGrid("instance").refresh();
+                                            formInstance.resetValues();
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown) {
+                                            console.log(textStatus, errorThrown);
+                                        }
+                                    });
+                                } else {
+                                    alert('Por favor complete todos los campos.');
+                                }
                             }
                         }
                     }
                 ]
-            });
+            }).dxForm("instance");
 
             // Inicializar el DataGrid DevExtreme
             $("#dataGridContainer").dxDataGrid({
@@ -108,22 +122,47 @@
                 columns: [
                     { dataField: "id", caption: "ID" },
                     { dataField: "tipo_documento", caption: "Tipo de Documento" },
-                    { dataField: "numero_documento", caption: "Número de Documento" },
+                    { dataField: "numero_documento", caption: "N° de Documento" },
                     { dataField: "nombre", caption: "Nombre" },
                     { dataField: "correo", caption: "Correo Electrónico" },
-                    { dataField: "direccion", caption: "Dirección Complementaria" },
+                    { dataField: "direccion", caption: "Dirección" },
                     {
                         dataField: "acciones",
                         caption: "Acciones",
                         cellTemplate: function(container, options) {
-                            $('<button>')
-                                .addClass('btn btn-warning btn-sm')
+                            var editarBtn = $('<button>')
+                                .addClass('btn btn-success btn-sm')
                                 .text('Editar')
                                 .appendTo(container);
-                            $('<button>')
-                                .addClass('btn btn-danger btn-sm')
-                                .text('Eliminar')
+
+                            var borrarBtn = $('<button>')
+                                .addClass('btn btn-danger btn-sm ml-1')
+                                .text('Borrar')
                                 .appendTo(container);
+
+                            editarBtn.on("click", function() {
+                                var data = options.data;
+                                // Aquí podrías abrir un modal con el formulario prellenado con los datos del contacto para edición
+                                console.log("Editar contacto con ID: " + data.id);
+                            });
+
+                            borrarBtn.on("click", function() {
+                                var data = options.data;
+                                if (confirm("¿Estás seguro de que quieres borrar este contacto?")) {
+                                    $.ajax({
+                                        url: '<?php echo base_url('index.php/welcome/deleteData'); ?>',
+                                        type: 'POST',
+                                        data: { id: data.id },
+                                        success: function(response) {
+                                            alert('Contacto borrado correctamente');
+                                            $("#dataGridContainer").dxDataGrid("instance").refresh();
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown) {
+                                            console.log(textStatus, errorThrown);
+                                        }
+                                    });
+                                }
+                            });
                         }
                     }
                 ],

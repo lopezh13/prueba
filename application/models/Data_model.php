@@ -17,5 +17,18 @@ class Data_model extends CI_Model {
         $this->db->insert('contactos', $data);
         return ($this->db->affected_rows() > 0) ? true : false;
     }
+
+    public function update_data($id, $data) {
+        $this->db->where('id', $id);
+        $this->db->update('contactos', $data);
+        return ($this->db->affected_rows() > 0) ? true : false;
+    }
+
+    public function delete_data($id) {
+        $this->db->where('id', $id);
+        $this->db->delete('contactos');
+        return ($this->db->affected_rows() > 0) ? true : false;
+    }
+    
 }
 ?>
