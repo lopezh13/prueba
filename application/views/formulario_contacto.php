@@ -51,6 +51,27 @@
         </div>
     </div>
 
+    <!-- Modal para editar -->
+    <div class="modal fade" id="editarModal" tabindex="-1" role="dialog" aria-labelledby="editarModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Contacto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="editarFormContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="guardarCambiosBtn">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function() {
             // Inicializar el formulario DevExtreme
@@ -142,8 +163,7 @@
 
                             editarBtn.on("click", function() {
                                 var data = options.data;
-                                // Aquí podrías abrir un modal con el formulario prellenado con los datos del contacto para edición
-                                console.log("Editar contacto con ID: " + data.id);
+                                mostrarModalEditar(data);
                             });
 
                             borrarBtn.on("click", function() {
@@ -175,6 +195,74 @@
                     showInfo: true
                 }
             });
+
+            // Función para mostrar el modal de edición
+            function mostrarModalEditar(data) {
+                var editarFormInstance = $("#editarFormContainer").dxForm({
+                    formData: data,
+                    items: [
+                        {
+                            dataField: "tipo_documento",
+                            label: { text: "Tipo de Documento" },
+                            editorType: "dxSelectBox",
+                            editorOptions: {
+                                items: ["DUI", "NIT", "Otros", "Pasaporte", "Carnet de Residencia"],
+                                value: data.tipo_documento
+                            }
+                        },
+                        {
+                            dataField: "numero_documento",
+                            label: { text: "Número de Documento" },
+                            editorOptions: {
+                                value: data.numero_documento
+                            }
+                        },
+                        {
+                            dataField: "nombre",
+                            label: { text: "Nombre" },
+                            editorOptions: {
+                                value: data.nombre
+                            }
+                        },
+                        {
+                            dataField: "correo",
+                            label: { text: "Correo Electrónico" },
+                            editorOptions: {
+                                value: data.correo
+                            }
+                        },
+                        {
+                            dataField: "direccion",
+                            label: { text: "Dirección Complementaria" },
+                            editorOptions: {
+                                value: data.direccion
+                            }
+                        }
+                    ]
+                }).dxForm("instance");
+
+                $('#editarModal').modal('show');
+
+                // Guardar cambios al hacer clic en el botón "Guardar Cambios" en el modal
+                $('#guardarCambiosBtn').on('click', function() {
+                    var formData = editarFormInstance.option("formData");
+                    formData.id = data.id; // Agregar el ID al formData para enviarlo al servidor
+
+                    $.ajax({
+                        url: '<?php echo base_url('index.php/welcome/updateData'); ?>',
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            alert('Datos actualizados correctamente');
+                            $("#dataGridContainer").dxDataGrid("instance").refresh();
+                            $('#editarModal').modal('hide');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(textStatus, errorThrown);
+                        }
+                    });
+                });
+            }
         });
     </script>
 </body>
