@@ -21,6 +21,9 @@
         }
         .form-container{
             width: 50%;
+            background-color: #F8F9F9;
+            padding: 20px;
+            border-radius: 10px;
         } 
         .grid-container {
             width: 100%;
@@ -37,6 +40,9 @@
             background-color: #0056b3;
             border-color: #0056b3;
         }
+        .dx-texteditor-input, .dx-selectbox .dx-selectbox-input {
+            background-color: #D7DBDD !important;
+        }
     </style>
 </head>
 <body>
@@ -46,7 +52,7 @@
             <div id="formContainer"></div>
         </div>
         <div class="grid-container mt-4">
-            <div class="table-title">Contactos Registrados</div>
+            <div class="table-title"><b>Contactos Registrados</b></div>
             <div id="dataGridContainer"></div>
         </div>
     </div>
