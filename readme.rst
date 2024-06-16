@@ -5,7 +5,7 @@ Prueba - Formulario
 Este es un formulario de registro de contactos escrito con PHP Version 7.4.33 | CodeIgniter V.3 
 Gestor de base de datos MySql | JQuery & Ajax ademas se uso la libreria DevExtreme
 
-
+.. image:: images/exm.png
 
 ###################
 What is CodeIgniter
